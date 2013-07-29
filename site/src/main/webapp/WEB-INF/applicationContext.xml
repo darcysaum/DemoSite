@@ -120,7 +120,26 @@
                 </entry>  
             </map>
         </property>
-    </bean>    
+    </bean>
+    
+    
+	<bean id="blCheckoutWorkflow" class="org.broadleafcommerce.core.workflow.SequenceProcessor">
+        <property name="processContextFactory">
+            <bean class="org.broadleafcommerce.core.checkout.service.workflow.CheckoutProcessContextFactory"/>
+        </property>
+        <property name="activities">
+            <list>
+                <ref bean="blVerifyCustomerMaxOfferUsesActivity" />
+                <ref bean="blPaymentServiceActivity" />
+                <ref bean="blRecordOfferUsageActivity" />
+                <ref bean="blCommitTaxActivity" />
+                <ref bean="blCompleteOrderActivity" />
+            </list>
+        </property>
+        <property name="defaultErrorHandler" ref="blDefaultErrorHandler"/>
+    </bean>
+    
+    
     
     <!-- This is an example of a custom dialect definition that uses a custom processor -->
     <!-- The second bean registers the dialct to the blWebTemplateEngine -->

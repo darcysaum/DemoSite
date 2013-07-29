@@ -49,7 +49,7 @@
         </artifact:mvn>
     </target>
 
-    <target name="jetty-demo-jrebel" depends="start-db">
+    <target name="jetty-demo-jrebel">
         <delete dir="war/WEB-INF/lib"/>
         <artifact:mvn mavenHome="${maven.home}" fork="true">
             <jvmarg value="-XX:MaxPermSize=256M" />
@@ -58,6 +58,7 @@
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n" />
             <jvmarg value="-Drebel.root=${project.root}" />
             <jvmarg value="-Dlogs.dir=${logs.dir}" />
+            <jvmarg value="-Drebel.jersey_plugin=true" />
             <jvmarg value="-noverify" />
             <jvmarg value="-javaagent:${jrebel.path}" />
             <jvmarg value="-Druntime.environment=${runtime.environment}" />  

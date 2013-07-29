@@ -21,4 +21,16 @@
         <!-- This file will contain bean overrides for extensions of Broadleaf entities -->
         <!-- For example, if you have a custom class that extends CustomerImpl, you would note that here -->
         
+        
+        <bean id="com.sage.entities.catalog.Book" class="com.mycompany.domain.Book"/>
+        <bean id="com.sage.entities.catalog.Journal" class="com.mycompany.domain.Journal"/>
+        <bean id="com.sage.entities.catalog.Electronic" class="com.mycompany.domain.Electronic"/>
+        
+        <bean id="org.broadleafcommerce.core.web.api.wrapper.ProductWrapper" class="com.mycompany.api.wrapper.SageProductWrapper" scope="prototype"/>
+        <bean id="org.broadleafcommerce.core.web.api.wrapper.SkuWrapper" class="com.mycompany.api.wrapper.SageSkuWrapper" scope="prototype">
+        	<property name="activeStartDate">
+        		<bean class="java.util.Date" />
+        	</property>
+        </bean>
+        
 </beans>

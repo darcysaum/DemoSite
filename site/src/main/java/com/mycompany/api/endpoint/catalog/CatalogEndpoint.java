@@ -16,6 +16,30 @@
 
 package com.mycompany.api.endpoint.catalog;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.broadleafcommerce.common.media.domain.Media;
+import org.broadleafcommerce.common.media.domain.MediaImpl;
+import org.broadleafcommerce.core.catalog.domain.Product;
+import org.broadleafcommerce.core.catalog.domain.Sku;
 import org.broadleafcommerce.core.web.api.wrapper.CategoriesWrapper;
 import org.broadleafcommerce.core.web.api.wrapper.CategoryAttributeWrapper;
 import org.broadleafcommerce.core.web.api.wrapper.CategoryWrapper;
@@ -28,19 +52,14 @@ import org.broadleafcommerce.core.web.api.wrapper.SkuAttributeWrapper;
 import org.broadleafcommerce.core.web.api.wrapper.SkuWrapper;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import com.mycompany.api.wrapper.SageProductWrapper;
+import com.mycompany.api.wrapper.SageSkuWrapper;
+import com.mycompany.domain.BaseProduct;
+import com.mycompany.domain.Book;
+import com.mycompany.domain.Electronic;
+import com.mycompany.domain.Journal;
 
 /**
  * This is a reference REST API endpoint for catalog. This can be modified, used as is, or removed. 
@@ -57,6 +76,51 @@ import javax.ws.rs.core.MediaType;
 @Consumes(value = { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 public class CatalogEndpoint extends
         org.broadleafcommerce.core.web.api.endpoint.catalog.CatalogEndpoint {
+	
+	private static final Log log = LogFactory.getLog(CatalogEndpoint.class);
+
+    @POST
+	@Path("product")
+    public SageProductWrapper createProduct(@Context HttpServletRequest request, SageProductWrapper wrapper) throws Exception{
+    	
+    	String type = wrapper.getType();
+    	
+    	
+    	BaseProduct prd = type.equalsIgnoreCase("Electronic") ? new Electronic() 
+    						: ( type.equalsIgnoreCase("Journal") ? new Journal() 
+    							: new Book() );
+
+    	Collections.sort(wrapper.getSkus());
+    	
+    	prd.setUrl("/"  + type.toLowerCase() + "s/" + wrapper.getProductId());
+    	
+    	List<Sku> skus = new ArrayList<Sku>();
+    	for(SageSkuWrapper sw : wrapper.getSkus()){
+    		skus.add(sw.unwrap(request, this.context));
+    	}
+    	
+    	prd.setDefaultSku(skus.get(0));
+    	skus.remove(0);
+    	prd.setAdditionalSkus(skus);
+
+    	if(!StringUtils.isEmpty(wrapper.getThumb())){
+    		Media m = new MediaImpl();
+    		m.setUrl(wrapper.getThumb());
+    		
+    		Map<String,Media> media = new HashMap<String, Media>();
+    		media.put("primary", m);
+    		prd.setMedia(media);
+    	}
+    	
+    	wrapper.populate(prd);
+    	
+    	catalogService.saveProduct(prd);
+
+    	log.info("product saved");
+    	
+    	return null;
+    }
+     
 
     @Override
     @GET

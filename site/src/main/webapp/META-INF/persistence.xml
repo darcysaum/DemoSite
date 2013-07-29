@@ -6,7 +6,7 @@
              
     <persistence-unit name="blPU" transaction-type="RESOURCE_LOCAL">
         <non-jta-data-source>jdbc/web</non-jta-data-source>
-        <class>com.mycompany.domain.Book</class>
+		<class>com.mycompany.domain.Book</class>
 		<class>com.mycompany.domain.Journal</class>
 		<class>com.mycompany.domain.Electronic</class>
         <exclude-unlisted-classes/>

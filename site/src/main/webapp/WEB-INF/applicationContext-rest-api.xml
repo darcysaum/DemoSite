@@ -52,4 +52,6 @@
          This MUST be marked as singleton. -->
     <bean class="org.broadleafcommerce.core.web.api.BroadleafRestExceptionMapper" scope="singleton"/>
     
+    <bean id="org.broadleafcommerce.core.web.api.wrapper.ProductWrapper" class="com.mycompany.api.wrapper.SageProductWrapper" scope="prototype"/>
+    
 </beans>
